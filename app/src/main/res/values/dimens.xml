@@ -1,0 +1,11 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="message_item_height">64dp</dimen>
+    <dimen name="message_item_margin">8dp</dimen>
+    <dimen name="message_item_padding">8dp</dimen>
+    <dimen name="logo_width">200dp</dimen>
+    <dimen name="logo_height">200dp</dimen>
+    <dimen name="loading_text_margin_bottom">30dp</dimen>
+</resources>

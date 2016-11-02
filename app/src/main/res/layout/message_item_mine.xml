@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/message_item_height">
+    
+    <ImageView
+        android:id="@+id/message_item_user_photo"
+        android:layout_margin="@dimen/message_item_margin"
+        android:layout_width="@dimen/message_item_height"
+        android:layout_height="@dimen/message_item_height" />
+
+    <TextView
+        android:id="@+id/message_item_text"
+        android:layout_toRightOf="@id/message_item_user_photo"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:layout_margin="@dimen/message_item_margin"
+        android:paddingLeft="@dimen/message_item_padding"
+        android:paddingRight="@dimen/message_item_padding"
+        android:gravity="center_vertical"
+        android:background="#AAAAAA"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Hello Test Message!">
+    </TextView>
+
+</RelativeLayout>

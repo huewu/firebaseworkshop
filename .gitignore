@@ -38,3 +38,9 @@ captures/
 
 # Keystore files
 *.jks
+
+# Directory files
+*.DS_Store
+
+# Firebase Settings
+google-services.json

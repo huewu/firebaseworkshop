@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">firebaseworkshop</string>
+    <string name="send">Send</string>
+    <string name="message_sample">input text here</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="now_loading">Now Loading...</string>
+</resources>
