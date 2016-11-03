@@ -6,4 +6,5 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="now_loading">Now Loading...</string>
+    <string name="sign_out">Log out</string>
 </resources>

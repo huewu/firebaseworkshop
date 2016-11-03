@@ -8,10 +8,15 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MessageListFragment extends Fragment {
 
@@ -31,6 +36,7 @@ public class MessageListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -84,4 +90,20 @@ public class MessageListFragment extends Fragment {
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.main_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.sign_out_menu:
+                //TODO implement sign out feature here
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 }
