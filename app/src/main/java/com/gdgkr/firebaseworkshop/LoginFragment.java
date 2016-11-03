@@ -11,10 +11,13 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class LoginFragment extends Fragment {
 
+    private static final String TAG = "LoginFragment";
     private OnUserLoginListener loginListener;
+
 
     public LoginFragment() {
         // Required empty public constructor
+        // Initialize FirebaseAuth
     }
 
     @Override
@@ -52,6 +55,18 @@ public class LoginFragment extends Fragment {
         return view;
     }
 
+    protected void notifyLoginCompleted(final FirebaseUser user) {
+        if (loginListener != null) {
+            loginListener.onLoginCompleted(user);
+        }
+    }
+
+    protected void notifyLoginFailed() {
+        if (loginListener != null) {
+            loginListener.onLoginFailed();
+        }
+    }
+
     private class ButtonHandler implements View.OnClickListener {
 
         @Override
@@ -69,25 +84,14 @@ public class LoginFragment extends Fragment {
         }
     }
 
-    protected void notifyLogin(final FirebaseUser user) {
-        if (loginListener != null) {
-            loginListener.onLoginCompleted(user);
-        }
-    }
-
+    private static final int RC_GOOGLE_SIGN_IN = 1013;
     private void signInWithGoogle() {
-        //TODO Implement Google SignIn
-        notifyLogin(null);
+        // TODO implement Google sign in
+        notifyLoginCompleted(null);
     }
 
     private void signInAsGuest() {
-        //TODO Implement Guest SignIn
-        notifyLogin(null);
-    }
-
-    public interface OnUserLoginListener {
-
-        void onLoginCompleted(FirebaseUser user);
-        void onLoginFailed();
+        // TODO implement Guest sign in
+        notifyLoginCompleted(null);
     }
 }

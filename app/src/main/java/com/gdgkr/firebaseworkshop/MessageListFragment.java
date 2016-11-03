@@ -16,11 +16,11 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 
-import com.google.firebase.auth.FirebaseAuth;
-
 public class MessageListFragment extends Fragment {
 
     private static final String TAG = "MessageListFragment";
+
+    private OnUserLoginListener loginListener;
 
     private RecyclerView messageListView;
     private Button sendButton;
@@ -31,6 +31,24 @@ public class MessageListFragment extends Fragment {
 
     public MessageListFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        if (context instanceof OnUserLoginListener) {
+            loginListener = (OnUserLoginListener) context;
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        if (loginListener != null) {
+            loginListener = null;
+        }
     }
 
     @Override
@@ -101,6 +119,7 @@ public class MessageListFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.sign_out_menu:
                 //TODO implement sign out feature here
+                loginListener.onLogoutCompleted(null);
                 return true;
         }
 

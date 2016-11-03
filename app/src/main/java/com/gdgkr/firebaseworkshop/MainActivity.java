@@ -7,7 +7,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseUser;
 
-public class MainActivity extends AppCompatActivity implements LoginFragment.OnUserLoginListener {
+public class MainActivity extends AppCompatActivity implements OnUserLoginListener {
 
     private static final String TAG = "MainActivity";
 
@@ -29,6 +29,16 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnU
     @Override
     public void onLoginFailed() {
         Toast.makeText(this, "Fail to login", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onLogoutCompleted(FirebaseUser user) {
+        FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+        tr.replace(R.id.activity_main, new LoginFragment());
+        tr.commit();
+
+        //TODO disconnect from providers
+        //user.getProviders()
     }
 
     private void showMessageListFragment() {
