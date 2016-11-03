@@ -1,17 +1,13 @@
 package com.gdgkr.firebaseworkshop;
 
 import android.os.Bundle;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+import com.google.firebase.auth.FirebaseUser;
+
+public class MainActivity extends AppCompatActivity implements LoginFragment.OnUserLoginListener {
 
     private static final String TAG = "MainActivity";
 
@@ -21,8 +17,24 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
-        //tr.add(R.id.activity_main, new LoginFragment());
-        tr.add(R.id.activity_main, new MessageListFragment());
+        tr.add(R.id.activity_main, new LoginFragment());
         tr.commit();
     }
+
+    @Override
+    public void onLoginCompleted(FirebaseUser user) {
+        showMessageListFragment();
+    }
+
+    @Override
+    public void onLoginFailed() {
+        Toast.makeText(this, "Fail to login", Toast.LENGTH_LONG).show();
+    }
+
+    private void showMessageListFragment() {
+        FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+        tr.replace(R.id.activity_main, new MessageListFragment());
+        tr.commit();
+    }
+
 }
