@@ -1,6 +1,5 @@
 package com.gdgkr.firebaseworkshop;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -35,7 +34,7 @@ public class LoginFragment extends Fragment {
                     signInWithGoogle();
                     break;
                 case R.id.login_guest:
-                    signInAsGoogle();
+                    signInAsGuest();
                     break;
                 default:
             }
@@ -46,7 +45,7 @@ public class LoginFragment extends Fragment {
         //TODO
     }
 
-    private void signInAsGoogle() {
+    private void signInAsGuest() {
         //TODO
     }
 
