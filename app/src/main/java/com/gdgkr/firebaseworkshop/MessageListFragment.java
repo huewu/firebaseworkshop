@@ -16,9 +16,15 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 public class MessageListFragment extends Fragment {
 
     private static final String TAG = "MessageListFragment";
+    public static final String MESSAGES_CHILD = "messages";
 
     private OnUserLoginListener loginListener;
 
@@ -27,7 +33,6 @@ public class MessageListFragment extends Fragment {
     private TextInputLayout inputTextView;
 
     private MessageDataAdapter msgAdapter;
-
 
     public MessageListFragment() {
         // Required empty public constructor
@@ -68,20 +73,29 @@ public class MessageListFragment extends Fragment {
         inputTextView = (TextInputLayout) view.findViewById(R.id.frag_input_layout);
 
         initiateLayout();
+        initiateRealtimeDatabase();
         return view;
+    }
+
+    private void initiateRealtimeDatabase() {
     }
 
     private void initiateLayout() {
         messageListView.requestFocus();
-        messageListView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        msgAdapter = new MessageDataAdapter();
-        msgAdapter.addMessageData(new MessageData("A", "Hello, B, Hello, C", null));
-        msgAdapter.addMessageData(new MessageData("A", "Good Morning", null));
-        msgAdapter.addMessageData(new MessageData("A", "How are you?", null));
-        msgAdapter.addMessageData(new MessageData("A", "I'm fne, and you?", null));
-        msgAdapter.addMessageData(new MessageData("A", "Let's code!", null));
-        msgAdapter.addMessageData(new MessageData("A", "DevFest Rocks!", null));
+        final LinearLayoutManager manager = new LinearLayoutManager(getContext());
+        messageListView.setLayoutManager(manager);
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(MESSAGES_CHILD);
+
+        msgAdapter = new MessageDataAdapter(ref, FirebaseAuth.getInstance().getCurrentUser());
+        msgAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                messageListView.scrollToPosition(msgAdapter.getItemCount() - 1);
+            }
+        });
 
         messageListView.setAdapter(msgAdapter);
 
@@ -89,16 +103,22 @@ public class MessageListFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 final String inputMsg = inputTextView.getEditText().getText().toString();
-                sendMessage(inputMsg);
-                inputTextView.getEditText().getText().clear();
-                messageListView.requestFocus();
-                hideSoftKeyboard(inputTextView.getEditText());
+                if (inputMsg != null && !inputMsg.isEmpty()) {
+                    sendMessage(inputMsg);
+                    inputTextView.getEditText().getText().clear();
+                    messageListView.requestFocus();
+                    hideSoftKeyboard(inputTextView.getEditText());
+                }
             }
         });
     }
 
     private void sendMessage(String message) {
-        msgAdapter.addMessageData(new MessageData("A", message, null));
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        MessageData msg
+                = new MessageData(user.getDisplayName(), message, user.getPhotoUrl().toString());
+        FirebaseDatabase.getInstance().getReference().child(MESSAGES_CHILD).push().setValue(msg);
+
         Log.d(TAG, "Send Message:" + message);
     }
 
@@ -119,7 +139,7 @@ public class MessageListFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.sign_out_menu:
                 //TODO implement sign out feature here
-                loginListener.onLogoutCompleted(null);
+                loginListener.onLogoutCompleted(FirebaseAuth.getInstance().getCurrentUser());
                 return true;
         }
 

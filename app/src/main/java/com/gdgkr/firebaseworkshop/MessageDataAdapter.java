@@ -10,10 +10,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
 
-import java.util.ArrayList;
+public class MessageDataAdapter extends FirebaseRecyclerAdapter<MessageData,
+        MessageDataAdapter.MessageViewHolder> {
 
-public class MessageDataAdapter extends RecyclerView.Adapter<MessageDataAdapter.MessageViewHolder> {
+    private FirebaseUser user;
+
+
+    public MessageDataAdapter(DatabaseReference ref, FirebaseUser user) {
+        super(MessageData.class, 0, MessageViewHolder.class, ref);
+        this.user = user;
+    }
 
     /*
      MessageViewHolder
@@ -32,7 +43,19 @@ public class MessageDataAdapter extends RecyclerView.Adapter<MessageDataAdapter.
         }
     }
 
-    private ArrayList<MessageData> msgDataArrayList = new ArrayList<>();
+
+    protected MessageData parseSnapshot(DataSnapshot snapshot) {
+        MessageData msg = snapshot.getValue(MessageData.class);
+
+        if (msg != null
+                && msg.name != null && msg.name.equals(user.getDisplayName())) {
+            msg.messageType = MessageData.MessageType.MESSAGE_FROM_ME;
+        } else {
+            msg.messageType = MessageData.MessageType.MESSAGE_FROM_OTHERS;
+        }
+
+        return msg;
+    }
 
     @Override
     public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -57,15 +80,12 @@ public class MessageDataAdapter extends RecyclerView.Adapter<MessageDataAdapter.
     }
 
     @Override
-    public int getItemCount() {
-        return msgDataArrayList.size();
+    public int getItemViewType(int position) {
+        return getItem(position).messageType.ordinal();
     }
 
     @Override
-    public void onBindViewHolder(MessageViewHolder holder, int position) {
-
-        final MessageData msg = msgDataArrayList.get(position);
-
+    protected void populateViewHolder(MessageViewHolder holder, MessageData msg, int position) {
         holder.TextView.setText(msg.text);
         if (msg.photoUrl == null) {
             holder.ImageView.setImageDrawable(ContextCompat.getDrawable(holder.ViewContext,
@@ -77,14 +97,7 @@ public class MessageDataAdapter extends RecyclerView.Adapter<MessageDataAdapter.
         }
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        return msgDataArrayList.get(position).messageType.ordinal();
-    }
-
     public void addMessageData(MessageData data) {
-        if (msgDataArrayList.add(data)) {
-            notifyItemChanged(msgDataArrayList.size()-1);
-        }
+        // DO nothing
     }
 }

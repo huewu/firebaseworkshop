@@ -19,21 +19,20 @@ public class MessageData {
         };
     }
 
-    public final String name;
-    public final String text;
-    public final String photoUrl;
+    public String name;
+    public String text;
+    public String photoUrl;
 
-    public final MessageType messageType;
+    public MessageType messageType;
+
+    private MessageData() {
+        this.messageType = MessageType.MESSAGE_FROM_OTHERS;
+    };
 
     public MessageData (String name, String text, String photoUrl) {
         this.name = name;
         this.text = text;
         this.photoUrl = photoUrl;
 
-        if (new Random().nextBoolean()) {
-            this.messageType = MessageType.MESSAGE_FROM_OTHERS;
-        } else {
-            this.messageType = MessageType.MESSAGE_FROM_ME;
-        }
     }
 }
