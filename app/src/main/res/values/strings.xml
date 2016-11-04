@@ -7,4 +7,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="now_loading">Now Loading...</string>
     <string name="sign_out">Log out</string>
+
+    <!-- KaKao API Key -->
+    <string name="kakao_app_key">9400a0720d36c61fee9f11a0841a33a7</string>
 </resources>

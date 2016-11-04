@@ -33,13 +33,25 @@ public class MessageDataAdapter extends FirebaseRecyclerAdapter<MessageData,
 
         final Context ViewContext;
         final TextView TextView;
-        final ImageView ImageView;
+        final ImageView ProfileImageView;
+        final ImageView PhotoImageView;
 
         public MessageViewHolder(View itemView) {
             super(itemView);
             TextView = (TextView) itemView.findViewById(R.id.message_item_text);
-            ImageView = (ImageView) itemView.findViewById(R.id.message_item_user_photo);
+            ProfileImageView = (ImageView) itemView.findViewById(R.id.message_item_user_photo);
+            PhotoImageView = (ImageView) itemView.findViewById(R.id.message_item_photo);
             ViewContext = itemView.getContext();
+
+            if (TextView != null) {
+                TextView.setTextColor(MessageListTheme.ColorText);
+                TextView.setBackgroundColor(MessageListTheme.ColorMessageBackground);
+            }
+
+            if (PhotoImageView != null) {
+                PhotoImageView.setBackgroundColor(
+                        MessageListTheme.ColorMessageBackground);
+            }
         }
     }
 
@@ -48,10 +60,19 @@ public class MessageDataAdapter extends FirebaseRecyclerAdapter<MessageData,
         MessageData msg = snapshot.getValue(MessageData.class);
 
         if (msg != null
-                && msg.name != null && msg.name.equals(user.getDisplayName())) {
-            msg.messageType = MessageData.MessageType.MESSAGE_FROM_ME;
+                && msg.getUuid() != null && msg.getUuid().equals(user.getUid())) {
+            if (msg.getPhotoUrl() != null) {
+                msg.setMessageType(MessageData.MessageType.PHOTO_FROM_ME);
+            } else {
+                msg.setMessageType(MessageData.MessageType.MESSAGE_FROM_ME);
+            }
+
         } else {
-            msg.messageType = MessageData.MessageType.MESSAGE_FROM_OTHERS;
+            if (msg.getPhotoUrl() != null) {
+                msg.setMessageType(MessageData.MessageType.PHOTO_FROM_OTHERS);
+            } else {
+                msg.setMessageType(MessageData.MessageType.MESSAGE_FROM_OTHERS);
+            }
         }
 
         return msg;
@@ -70,6 +91,12 @@ public class MessageDataAdapter extends FirebaseRecyclerAdapter<MessageData,
             case MESSAGE_FROM_OTHERS:
                 layout = R.layout.message_item_others;
                 break;
+            case PHOTO_FROM_ME:
+                layout = R.layout.photo_item_mine;
+                break;
+            case PHOTO_FROM_OTHERS:
+                layout = R.layout.photo_item_others;
+                break;
             default:
                 layout = R.layout.message_item_mine;
                 break;
@@ -81,19 +108,29 @@ public class MessageDataAdapter extends FirebaseRecyclerAdapter<MessageData,
 
     @Override
     public int getItemViewType(int position) {
-        return getItem(position).messageType.ordinal();
+        return getItem(position).getMessageType().ordinal();
     }
 
     @Override
     protected void populateViewHolder(MessageViewHolder holder, MessageData msg, int position) {
-        holder.TextView.setText(msg.text);
-        if (msg.photoUrl == null) {
-            holder.ImageView.setImageDrawable(ContextCompat.getDrawable(holder.ViewContext,
+        if (msg.getProfileUrl() == null) {
+            holder.ProfileImageView.setImageDrawable(ContextCompat.getDrawable(holder.ViewContext,
                     R.drawable.firebase_logo));
         } else {
             Glide.with(holder.ViewContext)
-                    .load(msg.photoUrl)
-                    .into(holder.ImageView);
+                    .load(msg.getProfileUrl())
+                    .into(holder.ProfileImageView);
+        }
+
+        if (msg.getPhotoUrl() != null && !msg.getPhotoUrl().isEmpty()) {
+            // Photo message
+            Glide.with(holder.ViewContext)
+                    .load(msg.getPhotoUrl())
+                    .into(holder.PhotoImageView);
+            //holder.PhotoImageView.setBackgroundColor(MessageListTheme.ColorMessageBackground);
+        } else {
+            // Text message
+            holder.TextView.setText(msg.getText());
         }
     }
 

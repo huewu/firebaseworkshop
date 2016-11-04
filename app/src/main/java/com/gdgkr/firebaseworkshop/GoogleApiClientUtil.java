@@ -6,10 +6,6 @@ import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-/**
- * Created by chansuk on 2016. 11. 3..
- */
-
 public class GoogleApiClientUtil {
 
     private static GoogleApiClient googleApiClient;

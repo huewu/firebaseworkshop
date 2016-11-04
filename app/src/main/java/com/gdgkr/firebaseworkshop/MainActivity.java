@@ -8,7 +8,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.FirebaseAuth;
@@ -41,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements OnUserLoginListen
         GoogleApiClientUtil.initialize(this, new GoogleApiClient.OnConnectionFailedListener() {
             @Override
             public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                // cannot be recovered automatically.
+                // To handle the error which cannot be recovered automatically.
             }
         });
     }
@@ -73,6 +72,8 @@ public class MainActivity extends AppCompatActivity implements OnUserLoginListen
             }
             Log.d(TAG, "Provider:" + provider);
         }
+
+        FirebaseAuth.getInstance().signOut();
     }
 
     private void showMessageListFragment() {

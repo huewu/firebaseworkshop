@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.gdgkr.firebaseworkshop.LoginActivity">
+    tools:context="com.gdgkr.firebaseworkshop.LoginFragment">
 
     <Button
         android:id="@+id/login_guest"
@@ -33,7 +33,6 @@
         android:layout_margin="@dimen/message_item_margin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-
 
     <ImageView
         android:id="@+id/app_logo"
