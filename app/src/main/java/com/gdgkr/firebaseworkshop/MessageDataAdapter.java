@@ -66,20 +66,20 @@ public class MessageDataAdapter extends RecyclerView.Adapter<MessageDataAdapter.
 
         final MessageData msg = msgDataArrayList.get(position);
 
-        holder.TextView.setText(msg.text);
-        if (msg.photoUrl == null) {
+        holder.TextView.setText(msg.getText());
+        if (msg.getPhotoUrl()== null) {
             holder.ImageView.setImageDrawable(ContextCompat.getDrawable(holder.ViewContext,
                     R.drawable.firebase_logo));
         } else {
             Glide.with(holder.ViewContext)
-                    .load(msg.photoUrl)
+                    .load(msg.getPhotoUrl())
                     .into(holder.ImageView);
         }
     }
 
     @Override
     public int getItemViewType(int position) {
-        return msgDataArrayList.get(position).messageType.ordinal();
+        return msgDataArrayList.get(position).getMessageType().ordinal();
     }
 
     public void addMessageData(MessageData data) {

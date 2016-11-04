@@ -4,6 +4,41 @@ import java.util.Random;
 
 public class MessageData {
 
+    private String name;
+    private String text;
+    private String photoUrl;
+    private MessageType messageType;
+
+    public MessageData (String name, String text, String photoUrl) {
+        this.name = name;
+        this.text = text;
+        this.photoUrl = photoUrl;
+
+        if (new Random().nextBoolean()) {
+            this.messageType = MessageType.MESSAGE_FROM_OTHERS;
+        } else {
+            this.messageType = MessageType.MESSAGE_FROM_ME;
+        }
+    }
+
+    private MessageData(){}
+
+    public String getName() {
+        return name;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public MessageType getMessageType() {
+        return messageType;
+    }
+
     public enum MessageType {
 
         MESSAGE_FROM_ME,
@@ -17,23 +52,5 @@ public class MessageData {
                 return MessageType.MESSAGE_FROM_OTHERS;
             }
         };
-    }
-
-    public final String name;
-    public final String text;
-    public final String photoUrl;
-
-    public final MessageType messageType;
-
-    public MessageData (String name, String text, String photoUrl) {
-        this.name = name;
-        this.text = text;
-        this.photoUrl = photoUrl;
-
-        if (new Random().nextBoolean()) {
-            this.messageType = MessageType.MESSAGE_FROM_OTHERS;
-        } else {
-            this.messageType = MessageType.MESSAGE_FROM_ME;
-        }
-    }
+    };
 }
