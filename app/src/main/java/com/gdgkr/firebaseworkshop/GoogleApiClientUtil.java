@@ -14,10 +14,10 @@ public class GoogleApiClientUtil {
 
     private static GoogleApiClient googleApiClient;
 
+    /*
     public static void initialize(
             FragmentActivity activity, GoogleApiClient.OnConnectionFailedListener listener) {
 
-        /*
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(activity.getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -26,7 +26,11 @@ public class GoogleApiClientUtil {
                 .enableAutoManage(activity, listener)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-        */
+    }
+    */
+
+    public static void initialize(GoogleApiClient client) {
+        googleApiClient = client;
     }
 
     public static GoogleApiClient getInstance() {
