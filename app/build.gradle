@@ -46,6 +46,19 @@ dependencies {
 
     // add test library dependencies here
     testCompile 'junit:junit:4.12'
+    
+    // To run this sample on Emulator using 9.6.1 version of library instead.
+    // Firebase dependencies here
+    // compile 'com.google.firebase:firebase-core:9.6.1'
+    // compile 'com.google.firebase:firebase-auth:9.6.1'
+    // compile 'com.google.firebase:firebase-database:9.6.1'
+    // compile 'com.google.firebase:firebase-config:9.6.1'
+    // compile 'com.google.firebase:firebase-storage:9.6.1'
+    // compile 'com.google.firebase:firebase-crash:9.6.1'
+    // compile 'com.google.android.gms:play-services-auth:9.6.1'
+    
+    // Firebase UI
+    // compile 'com.firebaseui:firebase-ui-database:0.6.1'
 }
 
 // ADD THIS AT THE BOTTOM
