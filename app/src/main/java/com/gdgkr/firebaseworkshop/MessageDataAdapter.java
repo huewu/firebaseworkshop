@@ -15,13 +15,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 
-public class MessageDataAdapter extends FirebaseRecyclerAdapter<MessageData,
+class MessageDataAdapter extends FirebaseRecyclerAdapter<MessageData,
         MessageDataAdapter.MessageViewHolder> {
 
     private FirebaseUser user;
 
 
-    public MessageDataAdapter(DatabaseReference ref, FirebaseUser user) {
+    MessageDataAdapter(DatabaseReference ref, FirebaseUser user) {
         super(MessageData.class, 0, MessageViewHolder.class, ref);
         this.user = user;
     }
@@ -29,14 +29,14 @@ public class MessageDataAdapter extends FirebaseRecyclerAdapter<MessageData,
     /*
      MessageViewHolder
      */
-    public static class MessageViewHolder extends RecyclerView.ViewHolder {
+    static class MessageViewHolder extends RecyclerView.ViewHolder {
 
         final Context ViewContext;
         final TextView TextView;
         final ImageView ProfileImageView;
         final ImageView PhotoImageView;
 
-        public MessageViewHolder(View itemView) {
+        MessageViewHolder(View itemView) {
             super(itemView);
             TextView = (TextView) itemView.findViewById(R.id.message_item_text);
             ProfileImageView = (ImageView) itemView.findViewById(R.id.message_item_user_photo);
@@ -59,21 +59,17 @@ public class MessageDataAdapter extends FirebaseRecyclerAdapter<MessageData,
     protected MessageData parseSnapshot(DataSnapshot snapshot) {
         MessageData msg = snapshot.getValue(MessageData.class);
 
-        if (msg != null
-                && msg.getUuid() != null && msg.getUuid().equals(user.getUid())) {
-            if (msg.getPhotoUrl() != null) {
-                msg.setMessageType(MessageData.MessageType.PHOTO_FROM_ME);
-            } else {
-                msg.setMessageType(MessageData.MessageType.MESSAGE_FROM_ME);
-            }
-
-        } else {
-            if (msg.getPhotoUrl() != null) {
-                msg.setMessageType(MessageData.MessageType.PHOTO_FROM_OTHERS);
-            } else {
-                msg.setMessageType(MessageData.MessageType.MESSAGE_FROM_OTHERS);
-            }
+        if (msg == null) {
+            return null;
         }
+
+        final boolean hasPhoto = (msg.getPhotoUrl() != null && !(msg.getPhotoUrl().isEmpty()));
+        final boolean fromMe = (msg.getUuid().equals(user.getUid()));
+
+        if (hasPhoto && fromMe) msg.setMessageType(MessageData.MessageType.PHOTO_FROM_ME);
+        if (hasPhoto && !fromMe) msg.setMessageType(MessageData.MessageType.PHOTO_FROM_OTHERS);
+        if (!hasPhoto && fromMe) msg.setMessageType(MessageData.MessageType.MESSAGE_FROM_ME);
+        if (!hasPhoto && !fromMe) msg.setMessageType(MessageData.MessageType.MESSAGE_FROM_OTHERS);
 
         return msg;
     }
@@ -132,9 +128,5 @@ public class MessageDataAdapter extends FirebaseRecyclerAdapter<MessageData,
             // Text message
             holder.TextView.setText(msg.getText());
         }
-    }
-
-    public void addMessageData(MessageData data) {
-        // DO nothing
     }
 }

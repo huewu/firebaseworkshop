@@ -4,12 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,14 +20,11 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.UploadTask;
@@ -36,9 +33,8 @@ import static android.app.Activity.RESULT_OK;
 
 public class MessageListFragment extends Fragment {
 
-    private static final String TAG = "MessageListFragment";
     public static final String MESSAGES_CHILD = "messages";
-
+    private static final String TAG = "MessageListFragment";
     private OnUserLoginListener loginListener;
 
     private RecyclerView messageListView;
@@ -46,6 +42,7 @@ public class MessageListFragment extends Fragment {
     private ImageButton attachButton;
     private TextInputLayout inputTextView;
 
+    private DatabaseReference dataReferene;
     private MessageDataAdapter msgAdapter;
 
     public MessageListFragment() {
@@ -88,14 +85,68 @@ public class MessageListFragment extends Fragment {
         inputTextView = (TextInputLayout) view.findViewById(R.id.frag_input_layout);
 
         initiateLayout();
-        initiateRealtimeDatabase();
         return view;
+    }
+
+    private void initiateLayout() {
+        messageListView.requestFocus();
+
+        final LinearLayoutManager manager = new LinearLayoutManager(getContext());
+        messageListView.setLayoutManager(manager);
+
+        dataReferene = FirebaseDatabase.getInstance().getReference().child(MESSAGES_CHILD);
+        msgAdapter = new MessageDataAdapter(dataReferene, FirebaseAuth.getInstance().getCurrentUser());
+        msgAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+
+                // Scroll to Bottom
+                messageListView.scrollToPosition(msgAdapter.getItemCount() - 1);
+            }
+        });
+
+        messageListView.setAdapter(msgAdapter);
+
+        inputTextView.getEditText().setOnKeyListener(
+                new View.OnKeyListener() {
+                    @Override
+                    public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
+                        if (keyCode == KeyEvent.KEYCODE_ENTER
+                                && keyEvent.getAction() == KeyEvent.ACTION_UP) {
+                            handleInputText();
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                handleInputText();
+            }
+        });
+
+        attachButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.setType("image/jpg");
+
+                // launch ImagePicker activity on the system.
+                // NO error check to simplify the code as much as possible.
+                startActivityForResult(intent, 0);
+            }
+        });
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode,
                                  Intent returnIntent) {
-        // If the selection didn't work
+
+        // Handle the result form ImangePicker activtiy.
+
         if (resultCode != RESULT_OK) {
             // Exit without doing anything else
             return;
@@ -109,80 +160,39 @@ public class MessageListFragment extends Fragment {
                     .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                            // show uploading progress
+                            // TODO show uploading progress
                         }
                     })
-                    .addOnCompleteListener(
-                    new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                    final Uri url = task.getResult().getDownloadUrl();
-                    sendMessage(url);
-                }
-            });
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot task) {
+                            final Uri url = task.getDownloadUrl();
+                            sendPhoto(url);
+                        }
+                    });
         }
     }
 
-    private void initiateRealtimeDatabase() {
-
-        FirebaseAnalytics.getInstance(getContext()).logEvent(
-                FirebaseAnalytics.Event.VIEW_ITEM, null);
+    private void sendPhoto(Uri attachedImageUri) {
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        MessageData msg = new MessageData(user, attachedImageUri);
+        FirebaseDatabase.getInstance().getReference().child(MESSAGES_CHILD).push().setValue(msg);
     }
 
-    private void initiateLayout() {
-        messageListView.requestFocus();
-
-        final LinearLayoutManager manager = new LinearLayoutManager(getContext());
-        messageListView.setLayoutManager(manager);
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(MESSAGES_CHILD);
-
-        msgAdapter = new MessageDataAdapter(ref, FirebaseAuth.getInstance().getCurrentUser());
-        msgAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onItemRangeInserted(int positionStart, int itemCount) {
-                super.onItemRangeInserted(positionStart, itemCount);
-                messageListView.scrollToPosition(msgAdapter.getItemCount() - 1);
-            }
-        });
-
-        messageListView.setAdapter(msgAdapter);
-
-        sendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (inputTextView.getEditText().getText().length() > 0) {
-                    final String inputMsg = inputTextView.getEditText().getText().toString();
-                    if (!inputMsg.isEmpty()) {
-                        sendMessage(inputMsg);
-                        inputTextView.getEditText().getText().clear();
-                        messageListView.requestFocus();
-                        hideSoftKeyboard(inputTextView.getEditText());
-                    }
-                }
-            }
-        });
-
-        attachButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                intent.setType("image/jpg");
-
-                startActivityForResult(intent, 0);
-            }
-        });
+    private void handleInputText() {
+        final String inputMsg = inputTextView.getEditText().getText().toString();
+        if (!inputMsg.isEmpty()) {
+            sendMessage(inputMsg);
+            inputTextView.getEditText().getText().clear();
+            messageListView.requestFocus();
+            hideSoftKeyboard(inputTextView.getEditText());
+        }
     }
 
     private void sendMessage(String message) {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         MessageData msg = new MessageData(user, message);
         Log.d(TAG, "Send Message:" + message);
-        FirebaseDatabase.getInstance().getReference().child(MESSAGES_CHILD).push().setValue(msg);
-    }
-
-    private void sendMessage(Uri attachedImageUri) {
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        MessageData msg = new MessageData(user, attachedImageUri);
         FirebaseDatabase.getInstance().getReference().child(MESSAGES_CHILD).push().setValue(msg);
     }
 

@@ -20,6 +20,7 @@ public class SplashActivity extends AppCompatActivity {
     private static final String TAG = "SplashActivity";
 
     static {
+        // To initialize remote data persistence only once.
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
     }
 

@@ -2,10 +2,9 @@ package com.gdgkr.firebaseworkshop;
 
 import com.google.firebase.auth.FirebaseUser;
 
-/**
- * Created by chansuk on 2016. 11. 3..
+/*
+    Interface to propagate user login events between Fragments & Activities.
  */
-
 public interface OnUserLoginListener {
 
     void onLoginCompleted(FirebaseUser user);
